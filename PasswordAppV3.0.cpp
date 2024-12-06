@@ -17,12 +17,15 @@ using namespace std;
 
 
 string input1, input2;
+int index;
 vector<pair<string, string>> Passwords; //vector pair of 2 strings
 
 void AddPassword();
 void RemovePassword();
 void EditPassword();
 void PasswordApp();
+void PrintPasswords();
+void ReplacePassword(int index, const string& newPassword, const string& newSite);
 void LoggingFile(const string& message);
 
 int main()
@@ -45,13 +48,7 @@ void PasswordApp() {
 	LoggingFile("Program Launched Successfully.");
 
 	do {
-		cout << "Passwords" << endl;
-		cout << "============================================================" << endl;
-		for (size_t i = 0; i < Passwords.size(); i++) { // iterate over the vector, output password for each entry.
-			cout << "#" << i + 1 << " Password: " << Passwords[i].first << " | Site/Application: " << Passwords[i].second << endl;
-		}
-		cout << "============================================================" << endl;
-		cout << endl;
+		PrintPasswords();
 
 		cout << "Please select your feature: \n";
 		cout << " 1: Add \n 2: Remove \n 3. Edit \n 4. Exit " << endl;
@@ -92,6 +89,22 @@ void PasswordApp() {
 	} while (runprogram);
 }
 
+void PrintPasswords() {
+
+	system("cls");
+	cout << "Please Select a Password to remove. \n" << endl;
+	cout << "Passwords" << endl;
+	cout << "============================================================" << endl;
+	for (size_t i = 0; i < Passwords.size(); i++) { // Iterate over the vector, output password for each entry.
+		cout << "#" << i + 1 << " Password: " << Passwords[i].first
+			<< " | Site/Application: " << Passwords[i].second << endl;
+	}
+	cout << "============================================================" << endl;
+	cout << endl;
+
+}
+
+
 void AddPassword() {
 
 		cout << "Please Enter a Password" << endl;
@@ -109,16 +122,9 @@ void AddPassword() {
 void RemovePassword() {
 	int removeinput;
 
-	system("cls");
-	cout << "Please Select a Password to remove. \n" << endl;
-	cout << "Passwords" << endl;
-	cout << "============================================================" << endl;
-	for (size_t i = 0; i < Passwords.size(); i++) { // Iterate over the vector, output password for each entry.
-		cout << "#" << i + 1 << " Password: " << Passwords[i].first
-			<< " | Site/Application: " << Passwords[i].second << endl;
-	}
-	cout << "============================================================" << endl;
-	cout << endl;
+	PrintPasswords();
+
+	cout << "Select a Password to remove\n" << endl;
 
 	cout << "> ";
 	cin >> removeinput;
@@ -131,7 +137,6 @@ void RemovePassword() {
 		cout << "Invalid input. Please enter an integer." << endl;
 
 		LoggingFile("Invalid Removal Entry.");
-
 	}
 
 	// Adjust for 1-based indexing
@@ -148,15 +153,35 @@ void RemovePassword() {
 	else {
 		cout << "Erase Failed. \n" << endl;
 	}
-}
 
+
+}
 
 void EditPassword() {
-	cout << "Your mom love";
 
+	PrintPasswords();
+
+	cout << "select index: ";
+	cin >> index;
+	index -= 1;
+	cout << "Password: ";
+	cin >> input1;
+	cout << "Site: ";
+	cin >> input2;
+	ReplacePassword(index, input1, input2);	
 }
 
-
+void ReplacePassword(int index, const string& newPassword, const string& newSite) {
+	// Check if the index is valid
+	if (index >= 0 && index < Passwords.size()) {
+		// Replace the entry at the given index with a new pair
+		Passwords[index] = make_pair(newPassword, newSite);
+		cout << "Password entry at index " << index + 1 << " has been replaced." << endl;
+	}
+	else {
+		cout << "Invalid index!" << endl;
+	}
+}
 
 void LoggingFile(const string& message) {
 
