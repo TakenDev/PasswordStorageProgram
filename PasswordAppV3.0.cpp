@@ -8,6 +8,15 @@
 #include <ctime>
 #include <iomanip>  // For put_time
 #include <algorithm>
+#include <random>
+#include <utility>
+
+
+// TODO:
+//	1. Find Library for SHA 256 hashing and implement.
+//  2. Find a way to send password and salt to DB for password to be read.
+//	3. Append and prepend salt and pepper to password, then hash, then send to db.
+
 
 
 using namespace std;
@@ -25,7 +34,10 @@ void RemovePassword();
 void EditPassword();
 void PasswordApp();
 void PrintPasswords();
+void SavePasswords();
 void ReplacePassword(int index, const string& newPassword, const string& newSite);
+
+pair<string,string> saltify(size_t length);
 void LoggingFile(const string& message);
 
 int main()
@@ -51,7 +63,7 @@ void PasswordApp() {
 		PrintPasswords();
 
 		cout << "Please select your feature: \n";
-		cout << " 1: Add \n 2: Remove \n 3. Edit \n 4. Exit " << endl;
+		cout << " 1: Add \n 2: Remove \n 3. Edit \n 4. Save Passwords \n 5. Exit " << endl;
 		cout << "\n> ";
 
 		cin >> select;
@@ -78,6 +90,8 @@ void PasswordApp() {
 				system("cls");
 				break;
 			case 4:
+				SavePasswords();
+			case 5:
 				runprogram = false;
 				break;
 			default:
@@ -156,7 +170,6 @@ void RemovePassword() {
 
 
 }
-
 void EditPassword() {
 
 	PrintPasswords();
@@ -170,7 +183,6 @@ void EditPassword() {
 	cin >> input2;
 	ReplacePassword(index, input1, input2);	
 }
-
 void ReplacePassword(int index, const string& newPassword, const string& newSite) {
 	// Check if the index is valid
 	if (index >= 0 && index < Passwords.size()) {
@@ -182,7 +194,41 @@ void ReplacePassword(int index, const string& newPassword, const string& newSite
 		cout << "Invalid index!" << endl;
 	}
 }
+void SavePasswords() {
+	
+	// salting
 
+	size_t saltLength = 16; // Desired length of the salt
+	pair<string, string> salt_pair = saltify(saltLength);
+
+	cout << "Generate Salt: " << salt_pair.first << endl;
+	cout << "Generate Pepper: " << salt_pair.second << endl;
+
+
+}
+
+pair<string, string> saltify(size_t length) {
+	
+	const string chars =
+		"abcdefghijklmnopqrstuvwxyz"
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		"0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+	mt19937 generator(static_cast<unsigned int>(time(nullptr))); // Seed with current time
+	uniform_int_distribution<> dist(0, chars.size() - 1); // Uniform distribution
+
+	string salt;
+	string pepper;
+
+	for (size_t i = 0; i < length; ++i) {
+		salt += chars[dist(generator)]; // Randomly select characters
+	}
+	for (size_t i = 0; i < length; ++i) {
+		pepper += chars[dist(generator)]; // Randomly select characters
+	}
+
+	return { salt, pepper };
+}
 void LoggingFile(const string& message) {
 
 	ofstream logFile("C:\\Users\\Randy\\OneDrive\\Desktop\\PasswordsTest\\logtest.txt", ios::app);
